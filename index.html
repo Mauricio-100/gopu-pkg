@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>gopu-pkg — Registre</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+</head>
+<body>
+  <h1>Bienvenue sur gopu-pkg ⚡️</h1>
+  <p>Registre de paquets pour a-Shell, servi via GitHub Pages.</p>
+
+  <h2>Recherche DuckDuckGo</h2>
+  <input id="ddg" placeholder="Tape ta recherche..." />
+  <button onclick="window.open('https://duckduckgo.com/?q='+encodeURIComponent(document.getElementById('ddg').value),'_blank')">Rechercher</button>
+
+  <h2>Résumé Wikipedia</h2>
+  <input id="wiki" placeholder="Sujet Wikipedia..." />
+  <button onclick="wikiFetch()">Afficher</button>
+  <pre id="wikiOut"></pre>
+  <script>
+    async function wikiFetch() {
+      const term = document.getElementById('wiki').value.trim();
+      if (!term) return;
+      const url = 'https://fr.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(term);
+      const out = document.getElementById('wikiOut');
+      out.textContent = 'Chargement...';
+      try {
+        const r = await fetch(url);
+        const data = await r.json();
+        out.textContent = (data.extract || 'Pas de résumé trouvé.') + "\n\nURL: " + (data.content_urls?.desktop?.page || 'n/a');
+      } catch (e) {
+        out.textContent = 'Erreur: ' + e.message;
+      }
+    }
+  </script>
+</body>
+</html>

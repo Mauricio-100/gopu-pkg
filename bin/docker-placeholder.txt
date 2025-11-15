@@ -1,0 +1,1 @@
+Ceci est un placeholder pour Docker (non exécutable sur iOS/a-Shell).
