@@ -1,0 +1,64 @@
+name: Build and Publish Registry
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer dépendances
+        run: sudo apt-get update && sudo apt-get install -y curl jq
+
+      - name: Télécharger paquets
+        run: |
+          mkdir -p bin
+          # Exemple: Go
+          curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz -o bin/go.tar.gz
+          # Rust (via rustup script)
+          curl -L https://sh.rustup.rs -o bin/rustup.sh
+          chmod +x bin/rustup.sh
+          # Node.js placeholder
+          echo "Node.js placeholder pour iOS/a-Shell" > bin/node-placeholder.txt
+          # sudo placeholder
+          echo "⚠️ sudo/root non disponible sur iOS" > bin/sudo-placeholder.txt
+          # abuild placeholder
+          echo "abuild pour Alpine Linux" > bin/abuild-install.sh
+
+      - name: Générer packages.json
+        run: |
+          echo '{' > packages.json
+          echo '"go": "https://Mauricio-100.github.io/gopu-pkg/bin/go.tar.gz",' >> packages.json
+          echo '"rust": "https://Mauricio-100.github.io/gopu-pkg/bin/rustup.sh",' >> packages.json
+          echo '"node": "https://Mauricio-100.github.io/gopu-pkg/bin/node-placeholder.txt",' >> packages.json
+          echo '"sudo": "https://Mauricio-100.github.io/gopu-pkg/bin/sudo-placeholder.txt",' >> packages.json
+          echo '"abuild": "https://Mauricio-100.github.io/gopu-pkg/bin/abuild-install.sh"' >> packages.json
+          echo '}' >> packages.json
+
+      - name: Commit et push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Mise à jour des paquets"
+          git push origin main
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dépôt
+        uses: actions/checkout@v4
+
+      - name: Déployer sur GitHub Pages
+        uses: actions/deploy-pages@v4
