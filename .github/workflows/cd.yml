@@ -1,0 +1,65 @@
+name: Build and Publish Registry with LFS
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dépôt
+        uses: actions/checkout@v4
+        with:
+          lfs: true   # ✅ active Git LFS
+
+      - name: Installer Git LFS
+        run: |
+          git lfs install
+          git lfs track "*.tar.gz"
+          git lfs track "*.zip"
+          git add .gitattributes
+
+      - name: Télécharger paquets lourds
+        run: |
+          mkdir -p bin
+          # Exemple Go
+          curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz -o bin/go1.22.0.linux-amd64.tar.gz
+          # Exemple Rust
+          curl -L https://static.rust-lang.org/dist/rust-1.75.0-x86_64-unknown-linux-gnu.tar.gz -o bin/rust-1.75.0.tar.gz
+          # Exemple Node.js
+          curl -L https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.gz -o bin/node-v20.11.0.tar.gz
+
+      - name: Générer packages.json
+        run: |
+          echo '{' > packages.json
+          echo '"go": "https://Mauricio-100.github.io/gopu-pkg/bin/go1.22.0.linux-amd64.tar.gz",' >> packages.json
+          echo '"rust": "https://Mauricio-100.github.io/gopu-pkg/bin/rust-1.75.0.tar.gz",' >> packages.json
+          echo '"node": "https://Mauricio-100.github.io/gopu-pkg/bin/node-v20.11.0.tar.gz"' >> packages.json
+          echo '}' >> packages.json
+
+      - name: Commit et push avec LFS
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Ajout paquets lourds via Git LFS"
+          git push origin main
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dépôt
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Déployer sur GitHub Pages
+        uses: actions/deploy-pages@v4
