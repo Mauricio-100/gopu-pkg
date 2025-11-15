@@ -1,0 +1,84 @@
+# Workflow complet pour construire et déployer ton registre sur GitHub Pages
+name: Build and Deploy Registry to Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer dépendances
+        run: sudo apt-get update && sudo apt-get install -y curl jq git-lfs
+
+      - name: Configurer Git LFS
+        run: |
+          git lfs install
+          git lfs track "*.tar.gz"
+          git lfs track "*.zip"
+          git add .gitattributes
+
+      - name: Télécharger paquets
+        run: |
+          mkdir -p bin
+          # Exemple Go
+          curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz -o bin/go1.22.0.linux-amd64.tar.gz
+          # Exemple Rust
+          curl -L https://static.rust-lang.org/dist/rust-1.75.0-x86_64-unknown-linux-gnu.tar.gz -o bin/rust-1.75.0.tar.gz
+          # Exemple Node.js
+          curl -L https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.gz -o bin/node-v20.11.0.tar.gz
+          # sudo placeholder
+          echo "⚠️ sudo/root non disponible sur iOS/a-Shell" > bin/sudo-placeholder.txt
+          # abuild placeholder
+          echo "abuild pour Alpine Linux" > bin/abuild-install.sh
+
+      - name: Générer packages.json
+        run: |
+          echo '{' > packages.json
+          echo '"go": "https://Mauricio-100.github.io/gopu-pkg/bin/go1.22.0.linux-amd64.tar.gz",' >> packages.json
+          echo '"rust": "https://Mauricio-100.github.io/gopu-pkg/bin/rust-1.75.0.tar.gz",' >> packages.json
+          echo '"node": "https://Mauricio-100.github.io/gopu-pkg/bin/node-v20.11.0.tar.gz",' >> packages.json
+          echo '"sudo": "https://Mauricio-100.github.io/gopu-pkg/bin/sudo-placeholder.txt",' >> packages.json
+          echo '"abuild": "https://Mauricio-100.github.io/gopu-pkg/bin/abuild-install.sh"' >> packages.json
+          echo '}' >> packages.json
+
+      - name: Commit et push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Mise à jour des paquets et artefacts"
+          git push origin main
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'   # ✅ tout le dépôt (index.html, packages.json, bin/)
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Déployer sur GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
