@@ -1,0 +1,51 @@
+name: Build and Deploy Registry
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dépôt
+        uses: actions/checkout@v4
+
+      - name: Préparer binaires
+        run: |
+          mkdir -p bin
+          echo "Hello Ceose ⚡️" > bin/hello.sh
+          echo "Placeholder Go" > bin/go.txt
+          echo "Placeholder Rust" > bin/rust.txt
+          echo "Placeholder Node.js" > bin/node.txt
+          echo "sudo non disponible sur iOS" > bin/sudo.txt
+          echo "abuild pour Alpine" > bin/abuild.txt
+
+      - name: Générer packages.json
+        run: |
+          echo '{' > packages.json
+          echo '"hello": "https://Mauricio-100.github.io/gopu-pkg/bin/hello.sh",' >> packages.json
+          echo '"go": "https://Mauricio-100.github.io/gopu-pkg/bin/go.txt",' >> packages.json
+          echo '"rust": "https://Mauricio-100.github.io/gopu-pkg/bin/rust.txt",' >> packages.json
+          echo '"node": "https://Mauricio-100.github.io/gopu-pkg/bin/node.txt",' >> packages.json
+          echo '"sudo": "https://Mauricio-100.github.io/gopu-pkg/bin/sudo.txt",' >> packages.json
+          echo '"abuild": "https://Mauricio-100.github.io/gopu-pkg/bin/abuild.txt"' >> packages.json
+          echo '}' >> packages.json
+
+      - name: Upload artefact pour Pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .   # ✅ tout le dépôt (index.html, packages.json, bin/)
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Déployer sur GitHub Pages
+        uses: actions/deploy-pages@v4
