@@ -1,5 +1,7 @@
 {
-"go": "https://Mauricio-100.github.io/gopu-pkg/bin/go1.22.0.linux-amd64.tar.gz",
-"rust": "https://Mauricio-100.github.io/gopu-pkg/bin/rust-1.75.0.tar.gz",
-"node": "https://Mauricio-100.github.io/gopu-pkg/bin/node-v20.11.0.tar.gz"
+"go": "https://Mauricio-100.github.io/gopu-pkg/bin/go.tar.gz",
+"rust": "https://Mauricio-100.github.io/gopu-pkg/bin/rustup.sh",
+"node": "https://Mauricio-100.github.io/gopu-pkg/bin/node-placeholder.txt",
+"sudo": "https://Mauricio-100.github.io/gopu-pkg/bin/sudo-placeholder.txt",
+"abuild": "https://Mauricio-100.github.io/gopu-pkg/bin/abuild-install.sh"
 }
