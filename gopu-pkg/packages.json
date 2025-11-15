@@ -1,0 +1,7 @@
+{
+  "go-install.sh": "https://mauricio-100.github.io/gopu-pkg/bin/go-install.sh",
+  "rust-install.sh": "https://mauricio-100.github.io/gopu-pkg/bin/rust-install.sh",
+  "node-install.sh": "https://mauricio-100.github.io/gopu-pkg/bin/node-install.sh",
+  "sudo-placeholder.txt": "https://mauricio-100.github.io/gopu-pkg/bin/sudo-placeholder.txt",
+  "abuild-install.sh": "https://mauricio-100.github.io/gopu-pkg/bin/abuild-install.sh"
+}
