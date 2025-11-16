@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -e
+
+# Définir ton registre
+PKG_SERVER="https://Mauricio-100.github.io/gopu-pkg/"
+PACKAGES_JSON="${PKG_SERVER}packages.json"
+
+# Vérifier argument
+if [ $# -lt 1 ]; then
+  echo "Usage: pkg install <package>"
+  exit 1
+fi
+
+ACTION=$1
+PACKAGE=$2
+
+if [ "$ACTION" != "install" ]; then
+  echo "Seule la commande 'install' est supportée"
+  exit 1
+fi
+
+# Télécharger packages.json
+TMP=$(mktemp)
+curl -sL "$PACKAGES_JSON" -o "$TMP"
+
+# Extraire l'URL du paquet
+URL=$(jq -r ".\"$PACKAGE\"" "$TMP")
+
+if [ "$URL" == "null" ]; then
+  echo "❌ Paquet '$PACKAGE' introuvable dans le registre"
+  exit 1
+fi
+
+# Installer le paquet
+DEST=~/Documents/bin/$PACKAGE
+echo "📦 Installation de $PACKAGE depuis $URL"
+curl -L "$URL" -o "$DEST"
+chmod +x "$DEST" || true
+
+echo "✅ $PACKAGE installé dans ~/Documents/bin/"
