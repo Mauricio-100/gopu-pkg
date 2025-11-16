@@ -32,7 +32,7 @@ if [ "$URL" == "null" ]; then
 fi
 
 # Installer le paquet
-DEST=~/Documents/bin/$PACKAGE
+DEST=$HOME/Documents/bin/$PACKAGE
 echo "📦 Installation de $PACKAGE depuis $URL"
 curl -L "$URL" -o "$DEST"
 chmod +x "$DEST" || true
